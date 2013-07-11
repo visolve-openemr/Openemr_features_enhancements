@@ -652,7 +652,11 @@ if ($_POST['form_action'] == "save") {
  if ($_POST['form_action'] != "") {
   // Close this window and refresh the calendar display.
   echo "<html>\n<body>\n<script language='JavaScript'>\n";
-  if ($info_msg) echo " alert('" . addslashes($info_msg) . "');\n";
+  if ($info_msg) 
+  {
+	echo " alert('" . addslashes($info_msg) . "');\n";
+	echo "window.open('../../patient_file/front_payment.php', '_blank', 'width=750,height=550,resizable=1,scrollbars=1');\n";
+  }
   echo " if (opener && !opener.closed && opener.refreshme) opener.refreshme();\n";
   echo " window.close();\n";
   echo "</script>\n</body>\n</html>\n";

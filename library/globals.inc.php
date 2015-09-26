@@ -697,7 +697,7 @@ $GLOBALS_METADATA = array(
         '0' => xl('08/05{{CMS 1500 format date revision setting in globals}}'),
         '1' => xl('02/12{{CMS 1500 format date revision setting in globals}}'),
       ),
-      '0',                              // default
+      '1',                              // default
       xl('This specifies which revision of the form the billing module should generate')
     ),
      
@@ -1170,6 +1170,17 @@ $GLOBALS_METADATA = array(
       xl('Must be empty if SMTP authentication is not used.')
     ),
 
+    'SMTP_SECURE' => array(
+      xl('SMTP Security Protocol'),
+      array(
+        '' => xl('None'),
+        'ssl'  => 'SSL',
+        'tls'  => 'TLS'
+      ),
+      '',
+      xl('SMTP security protocol to connect with. Required by some servers such as gmail.')
+    ),
+	
     'EMAIL_NOTIFICATION_HOUR' => array(
       xl('Email Notification Hours'),
       'num',                            // data type

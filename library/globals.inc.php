@@ -306,7 +306,14 @@ $GLOBALS_METADATA = array(
       '0',                              // default
       xl('Special treatment for the Vitals form')
     ),
-
+    
+    //ViSolve - Global variable to decide expand document tree on load
+    'expand_document' => array(
+      xl('Expand Documents Categories'),
+      'bool',                           // data type
+      '0',                              // default = false
+      xl('Expand All Documents Categories on load')
+    ),
   ),
 
   // Locale Tab

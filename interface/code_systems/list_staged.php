@@ -211,6 +211,15 @@ if (is_dir($mainPATH)) {
 	    	    $supported_file = 1;
                 }
 	    }
+	    else if($db == 'CQM_VALUESET'){
+		if (preg_match("/EP_VALUESET_([0-9]{8}).zip/",$file,$matches)) {
+			 $version = "International:English";
+                    	 $date_release = substr($matches[1],0,4)."-".substr($matches[1],4,-2)."-".substr($matches[1],6);
+                    	 $temp_date = array('date'=>$date_release, 'version'=>$version, 'path'=>$mainPATH."/".$matches[0]);
+                    	 array_push($revisions,$temp_date);
+                    	 $supported_file = 1;
+		}
+	    }
 	    if ($supported_file === 1) {
 		?><div class="stg"><?php echo text(basename($file)); ?></div>
 		<?php
@@ -293,6 +302,8 @@ if ($supported_file === 1) {
   // Determine and enforce only a certain number of files to be staged
   if ($success_flag === 1) {
     $number_files = 1;
+ print_r($file_revision);
+print_r($file_revision_date);
     $sql_query_ret = sqlStatement("SELECT * FROM `supported_external_dataloads` WHERE `load_type` = ? AND `load_source` = ? AND `load_release_date` = ?", array($db,$file_revision,$file_revision_date) );
     $number_files_temp = sqlNumRows($sql_query_ret);
     if ($number_files_temp > 1) {

@@ -390,6 +390,24 @@ function icd_import($type) {
     return true;
 }
 
+function valueset_import($type){
+	$dir_valueset = $GLOBALS['temporary_files_dir']."/".$type."/";
+    	$dir = str_replace('\\','/',$dir_valueset);
+	if( is_dir($dir) && $handle = opendir($dir)) {
+		while (false !== ($filename = readdir($handle))) {
+			if(stripos($filename, ".csv")){
+				$abs_path = $dir.$filename;
+        			$sql  = "LOAD DATA LOCAL INFILE '$abs_path' INTO TABLE valueset FIELDS TERMINATED BY ','  ENCLOSED BY '\"' LINES TERMINATED BY '\n'  IGNORE 1 LINES (@col1,@col2,@col3,@col4,@col5,@col6,@col7,@col8,@col9,@col10,@col11,@col12)set code=@col8 ,nqf_code=@col2, code_type=@col10,code_system=@col11,valueset=@col4,description=@col9,valueset_name=@col3";
+        			sqlStatement($sql);
+        			sqlStatement("UPDATE valueset set code_type='SNOMED CT' where code_type='SNOMEDCT'");
+        			sqlStatement("UPDATE valueset set code_type='ICD9' where code_type='ICD9CM'");
+        			sqlStatement("UPDATE valueset set code_type='ICD10' where code_type='ICD10CM'");
+			}
+		}
+	}
+        return true;
+}
+
 // Function to clean up temp files
 // $type (RXNORM etc.)
 function temp_dir_cleanup($type) {
@@ -411,6 +429,10 @@ function update_tracker_table($type,$revision,$version,$file_checksum) {
     }
     else if ($type == 'ICD9') {
         sqlStatement("INSERT INTO `standardized_tables_track` (`imported_date`,`name`,`revision_date`, `revision_version`, `file_checksum`) VALUES (NOW(),'ICD9',?,?,?)", array($revision, $version, $file_checksum) );
+        return true;
+    }
+    else if($type == 'CQM_VALUESET'){
+        sqlStatement("INSERT INTO `standardized_tables_track` (`imported_date`,`name`,`revision_date`) VALUES (NOW(),'CQM_VALUESET',?)", array($revision) );
         return true;
     }
     else { // $type == 'ICD10') 

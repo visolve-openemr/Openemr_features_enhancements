@@ -961,8 +961,15 @@ foreach ($layouts as $key => $value) {
 <?php if ($layout_id) { ?>
 <div style='margin: 0 0 8pt 0;'>
 <input type='button' class='addgroup' id='addgroup' value=<?php xl('Add Group','e','\'','\''); ?>/>
+<span style="font-size:90%">
+<input type='button' name='save' id='save' value='<?php xl('Save Changes','e'); ?>' /></span>
 </div>
-<?php } ?>
+<div style='margin: 0 0 8pt 0;'>
+<?php xl('With selected:', 'e');?>
+<input type='button' name='deletefields1' id='deletefields1' value='<?php xl('Delete','e'); ?>' style="font-size:90%" disabled="disabled" />
+<input type='button' name='movefields1' id='movefields1' value='<?php xl('Move to...','e'); ?>' style="font-size:90%" disabled="disabled" />
+<br><br>
+</div><?php } ?>
 
 <?php 
 $prevgroup = "!@#asdf1234"; // an unlikely group name
@@ -1276,21 +1283,27 @@ $(document).ready(function(){
 
     $(".addfield").click(function() { AddField(this); });
     $("#deletefields").click(function() { DeleteFields(this); });
+    $("#deletefields1").click(function() { DeleteFields(this); });
     $(".selectfield").click(function() { 
         var TRparent = $(this).parent().parent();
         $(TRparent).children("td").toggleClass("highlight");
         // disable the delete-move buttons
         $("#deletefields").attr("disabled", "disabled");
+        $("#deletefields1").attr("disabled", "disabled");
         $("#movefields").attr("disabled", "disabled");
+        $("#movefields1").attr("disabled", "disabled");
         $(".selectfield").each(function(i) {
             // if any field is selected, enable the delete-move buttons
             if ($(this).attr("checked") == true) {
                 $("#deletefields").removeAttr("disabled");
+                $("#deletefields1").removeAttr("disabled");
                 $("#movefields").removeAttr("disabled");
+                $("#movefields1").removeAttr("disabled");
             }
         });
     });
     $("#movefields").click(function() { ShowGroups(this); });
+    $("#movefields1").click(function() { ShowGroups(this); });
     $(".savenewfield").click(function() { SaveNewField(this); });
     $(".cancelnewfield").click(function() { CancelNewField(this); });
     $("#newtitle").blur(function() { if ($("#newid").val() == "") $("#newid").val($("#newtitle").val()); });

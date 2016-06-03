@@ -752,13 +752,14 @@ a, a:visited, a:hover { color:#0000cc; }
 .optcell  { }
 .optin    { background: transparent; }
 .group {
-    margin: 0pt 0pt 8pt 0pt;
+    margin: 40pt 0pt 8pt 0pt;
     padding: 0;
     width: 100%;
 }
 .group table {
     border-collapse: collapse;
     width: 100%;
+    
 }
 .odd td {
     background-color: #ddddff;
@@ -779,7 +780,19 @@ a, a:visited, a:hover { color:#0000cc; }
     background-color: yellow;
     color: black;
 }
-</style>
+.menuBar{
+    width:100%;
+    height:50px;
+    display:block;
+    position:fixed;
+    top:0;
+    left:0;
+    background-color: #8CACBB;
+    z-index: 9999;
+    }
+    
+   
+</style> 
 
 <script language="JavaScript">
 
@@ -945,8 +958,9 @@ function cidChanged(lino, seq) {
 <!-- elements used to select more than one field -->
 <input type="hidden" name="selectedfields" id="selectedfields" value="">
 <input type="hidden" id="targetgroup" name="targetgroup" value="">
-
-<p><b><?php xl('Edit layout','e'); ?>:</b>&nbsp;
+<table class='menubar'>
+<thead><tr><td>
+<b><?php xl('Edit layout','e'); ?>:</b>&nbsp;
 <select name='layout_id' id='layout_id'>
  <option value=''>-- <?php echo xl('Select') ?> --</option>
 <?php
@@ -956,21 +970,17 @@ foreach ($layouts as $key => $value) {
   echo ">$value</option>\n";
 }
 ?>
-</select></p>
-
+</select>
 <?php if ($layout_id) { ?>
-<div style='margin: 0 0 8pt 0;'>
 <input type='button' class='addgroup' id='addgroup' value=<?php xl('Add Group','e','\'','\''); ?>/>
 <span style="font-size:90%">
 <input type='button' name='save' id='save' value='<?php xl('Save Changes','e'); ?>' /></span>
-</div>
-<div style='margin: 0 0 8pt 0;'>
 <?php xl('With selected:', 'e');?>
 <input type='button' name='deletefields1' id='deletefields1' value='<?php xl('Delete','e'); ?>' style="font-size:90%" disabled="disabled" />
 <input type='button' name='movefields1' id='movefields1' value='<?php xl('Move to...','e'); ?>' style="font-size:90%" disabled="disabled" />
-<br><br>
-</div><?php } ?>
-
+</thead></td></tr>
+</table>
+<?php } ?>
 <?php 
 $prevgroup = "!@#asdf1234"; // an unlikely group name
 $firstgroup = true; // flag indicates it's the first group to be displayed

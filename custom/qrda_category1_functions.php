@@ -355,7 +355,7 @@
 		
 		foreach($medArr as $medRow){
 			
-			$vset = sqlStatement("select * from valueset where code =".$medRow['cvx_code']." and code_type = 'cvx' and nqf_code =".$xml->nqf_code);
+			$vset = sqlStatement("select * from valueset where code =".add_escape_custom($medRow['cvx_code'])." and code_type = 'cvx' and nqf_code =".add_escape_custom($xml->nqf_code));
 			foreach($vset as $v){
 			if(!empty($v['valueset'])){
 			//Entry open

@@ -751,7 +751,7 @@ else {
      }
      echo "</td>";
      
-     if($$type_report == 'cqm' || $type_report == 'cqm_2011' || $type_report == 'cqm_2014')
+     if($type_report == 'cqm' || $type_report == 'cqm_2011' || $type_report == 'cqm_2014')
      	echo "<td align='center'>" . $row['initial_population'] . "</td>";
      else 
      	echo "<td align='center'>" . $row['total_patients'] . "</td>";

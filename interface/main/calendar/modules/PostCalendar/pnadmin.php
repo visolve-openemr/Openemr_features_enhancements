@@ -1444,8 +1444,8 @@ function postcalendar_admin_categories($msg='',$e='',$args)
 	$tpl->assign('DurationMinTitle', _PC_DURATION_MIN);
     $tpl->assign('InputDurationHour', "durationh");
 	$tpl->assign('InputDurationMin', "durationm");
-	$tpl->assign('ActiveTitleYes','Yes');
-	$tpl->assign('ActiveTitleNo','No');
+	$tpl->assign('ActiveTitleYes',xl('Yes'));
+	$tpl->assign('ActiveTitleNo',xl('No'));
 	
     $output->SetOutputMode(_PNH_RETURNOUTPUT);
     $authkey = $output->FormHidden('authid',pnSecGenAuthKey());

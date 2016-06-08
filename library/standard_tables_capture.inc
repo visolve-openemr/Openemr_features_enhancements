@@ -393,18 +393,34 @@ function icd_import($type) {
 function valueset_import($type){
 	$dir_valueset = $GLOBALS['temporary_files_dir']."/".$type."/";
     	$dir = str_replace('\\','/',$dir_valueset);
+    sqlStatementNoLog("SET autocommit=0");
+    sqlStatementNoLog("START TRANSACTION");
 	if( is_dir($dir) && $handle = opendir($dir)) {
 		while (false !== ($filename = readdir($handle))) {
-			if(stripos($filename, ".csv")){
-				$abs_path = $dir.$filename;
-        			$sql  = "LOAD DATA LOCAL INFILE '$abs_path' INTO TABLE valueset FIELDS TERMINATED BY ','  ENCLOSED BY '\"' LINES TERMINATED BY '\n'  IGNORE 1 LINES (@col1,@col2,@col3,@col4,@col5,@col6,@col7,@col8,@col9,@col10,@col11,@col12)set code=@col8 ,nqf_code=@col2, code_type=@col10,code_system=@col11,valueset=@col4,description=@col9,valueset_name=@col3";
-        			sqlStatement($sql);
-        			sqlStatement("UPDATE valueset set code_type='SNOMED CT' where code_type='SNOMEDCT'");
-        			sqlStatement("UPDATE valueset set code_type='ICD9' where code_type='ICD9CM'");
-        			sqlStatement("UPDATE valueset set code_type='ICD10' where code_type='ICD10CM'");
+			if(stripos($filename, ".xml")){
+					$abs_path = $dir.$filename;
+					$xml  = simplexml_load_file($abs_path,null,null,'ns0',true);
+					$nqf_code = null;
+					foreach($xml->DescribedValueSet as $vset){
+						$vset_attr = $vset->attributes();
+						$nqf = $vset->xpath('ns0:Group[@displayName="NQF Number"]/ns0:Keyword');
+						$nqf_code = $nqf[0];
+						foreach($vset->ConceptList as $cp){
+							foreach($cp->Concept as $con){
+								$con_attr = $con->attributes();
+								sqlStatementNoLog("INSERT INTO valueset values(?,?,?,?,?,?,?) on DUPLICATE KEY UPDATE code_system = values(code_system),description = values(description),valueset_name = values(valueset_name)",array($nqf_code,$con_attr->code,$con_attr->codeSystem,$con_attr->codeSystemName,$vset_attr->ID,$con_attr->displayName,$vset_attr->displayName));
+							}
+						}	
+					}
+        			
+        			sqlStatementNoLog("UPDATE valueset set code_type='SNOMED CT' where code_type='SNOMEDCT'");
+        			sqlStatementNoLog("UPDATE valueset set code_type='ICD9' where code_type='ICD9CM'");
+        			sqlStatementNoLog("UPDATE valueset set code_type='ICD10' where code_type='ICD10CM'");
 			}
 		}
 	}
+	sqlStatementNoLog("COMMIT");
+	sqlStatementNoLog("SET autocommit=1");
         return true;
 }
 

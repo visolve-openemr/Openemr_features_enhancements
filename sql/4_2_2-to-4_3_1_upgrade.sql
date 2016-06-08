@@ -74,7 +74,6 @@
 
 #IfNotTable valueset
 CREATE TABLE IF NOT EXISTS `valueset` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
   `nqf_code` varchar(255) DEFAULT NULL,
   `code` varchar(255) DEFAULT NULL,
   `code_system` varchar(255) DEFAULT NULL,
@@ -82,10 +81,8 @@ CREATE TABLE IF NOT EXISTS `valueset` (
   `valueset` varchar(255) DEFAULT NULL,
   `description` varchar(255) DEFAULT NULL,
   `valueset_name` varchar(500) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `code` (`code`),
-  KEY `nqf_code` (`nqf_code`)
-) ENGINE=InnoDB AUTO_INCREMENT=1;
+  PRIMARY KEY (`nqf_code`,`code`,`valueset`)
+) ENGINE=InnoDB;
 #EndIf
 
 #IfMissingColumn openemr_postcalendar_categories pc_active

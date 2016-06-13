@@ -752,10 +752,11 @@ a, a:visited, a:hover { color:#0000cc; }
 .optcell  { }
 .optin    { background: transparent; }
 .group {
-    margin: 40pt 0pt 8pt 0pt;
-    padding: 0;
-    width: 100%;
+    margin: 0pt 0pt 8pt 0pt;
+    padding :0pt;
+    width: 100%;   
 }
+
 .group table {
     border-collapse: collapse;
     width: 100%;
@@ -780,18 +781,7 @@ a, a:visited, a:hover { color:#0000cc; }
     background-color: yellow;
     color: black;
 }
-.menuBar{
-    width:100%;
-    height:50px;
-    display:block;
-    position:fixed;
-    top:0;
-    left:0;
-    background-color: #8CACBB;
-    z-index: 9999;
-    }
-    
-   
+
 </style> 
 
 <script language="JavaScript">
@@ -958,8 +948,8 @@ function cidChanged(lino, seq) {
 <!-- elements used to select more than one field -->
 <input type="hidden" name="selectedfields" id="selectedfields" value="">
 <input type="hidden" id="targetgroup" name="targetgroup" value="">
-<table class='menubar'>
-<thead><tr><td>
+<div class="menubar">
+<div>
 <b><?php xl('Edit layout','e'); ?>:</b>&nbsp;
 <select name='layout_id' id='layout_id'>
  <option value=''>-- <?php echo xl('Select') ?> --</option>
@@ -970,16 +960,17 @@ foreach ($layouts as $key => $value) {
   echo ">$value</option>\n";
 }
 ?>
-</select>
+</select></div><div><p>
 <?php if ($layout_id) { ?>
 <input type='button' class='addgroup' id='addgroup' value=<?php xl('Add Group','e','\'','\''); ?>/>
-<span style="font-size:90%">
-<input type='button' name='save' id='save' value='<?php xl('Save Changes','e'); ?>' /></span>
+<span style="font-size:90%"> &nbsp;
+<input type='button' name='save' id='save' value='<?php xl('Save Changes','e'); ?>' /></span> &nbsp;&nbsp;
 <?php xl('With selected:', 'e');?>
-<input type='button' name='deletefields1' id='deletefields1' value='<?php xl('Delete','e'); ?>' style="font-size:90%" disabled="disabled" />
-<input type='button' name='movefields1' id='movefields1' value='<?php xl('Move to...','e'); ?>' style="font-size:90%" disabled="disabled" />
-</thead></td></tr>
-</table>
+<input type='button' name='deletefields' id='deletefields' value='<?php xl('Delete','e'); ?>' style="font-size:90%" disabled="disabled" />
+<input type='button' name='movefields' id='movefields' value='<?php xl('Move to...','e'); ?>' style="font-size:90%" disabled="disabled" /></span>
+</p></div>
+</div>
+<div class="container">
 <?php } ?>
 <?php 
 $prevgroup = "!@#asdf1234"; // an unlikely group name
@@ -1011,7 +1002,6 @@ while ($row = sqlFetchArray($res)) {
     echo "</div>";
     $firstgroup = false;
 ?>
-
 <table>
 <thead>
  <tr class='head'>
@@ -1055,7 +1045,7 @@ while ($row = sqlFetchArray($res)) {
 </table></div>
 
 <?php echo $extra_html; ?>
-
+<!----
 <?php if ($layout_id) { ?>
 <span style="font-size:90%">
 <?php xl('With selected:', 'e');?>
@@ -1065,7 +1055,7 @@ while ($row = sqlFetchArray($res)) {
 <p>
 <input type='button' name='save' id='save' value='<?php xl('Save Changes','e'); ?>' />
 </p>
-<?php } ?>
+<?php } ?>---->
 
 </form>
 
@@ -1284,36 +1274,28 @@ $(document).ready(function(){
     $(".savenewgroup").click(function() { SaveNewGroup(this); });
     $(".deletegroup").click(function() { DeleteGroup(this); });
     $(".cancelnewgroup").click(function() { CancelNewGroup(this); });
-
     $(".movegroup").click(function() { MoveGroup(this); });
-
     $(".renamegroup").click(function() { RenameGroup(this); });
     $(".saverenamegroup").click(function() { SaveRenameGroup(this); });
     $(".cancelrenamegroup").click(function() { CancelRenameGroup(this); });
-
     $(".addfield").click(function() { AddField(this); });
     $("#deletefields").click(function() { DeleteFields(this); });
-    $("#deletefields1").click(function() { DeleteFields(this); });
     $(".selectfield").click(function() { 
         var TRparent = $(this).parent().parent();
         $(TRparent).children("td").toggleClass("highlight");
         // disable the delete-move buttons
         $("#deletefields").attr("disabled", "disabled");
-        $("#deletefields1").attr("disabled", "disabled");
         $("#movefields").attr("disabled", "disabled");
-        $("#movefields1").attr("disabled", "disabled");
         $(".selectfield").each(function(i) {
             // if any field is selected, enable the delete-move buttons
             if ($(this).attr("checked") == true) {
                 $("#deletefields").removeAttr("disabled");
-                $("#deletefields1").removeAttr("disabled");
                 $("#movefields").removeAttr("disabled");
-                $("#movefields1").removeAttr("disabled");
+              
             }
         });
     });
     $("#movefields").click(function() { ShowGroups(this); });
-    $("#movefields1").click(function() { ShowGroups(this); });
     $(".savenewfield").click(function() { SaveNewField(this); });
     $(".cancelnewfield").click(function() { CancelNewField(this); });
     $("#newtitle").blur(function() { if ($("#newid").val() == "") $("#newid").val($("#newtitle").val()); });

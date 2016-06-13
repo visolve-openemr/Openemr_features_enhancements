@@ -239,6 +239,9 @@ else if ($_POST['formaction']=='deletelist') {
     sqlStatement("DELETE FROM list_options WHERE list_id = 'lists' and option_id='".$_POST['list_id']."'");
 }
 
+else if($_POST['formaction']=='buttonvalue'){
+ $cnt= $_POST['numrows'];
+}
 $opt_line_no = 0;
 
 // Given a string of multiple instances of code_type|code|selector,
@@ -836,8 +839,12 @@ while ($row = sqlFetchArray($res)) {
 
 ?>
 </select>
-<input type="button" id="<?php echo $list_id; ?>" class="deletelist" value=<?php xl('Delete List','e','\'','\''); ?>>
-<input type="button" id="newlist" class="newlist" value=<?php xl('New List','e','\'','\''); ?>>
+
+ <input type="button" id="<?php echo $list_id; ?>" class="deletelist" value=<?php xl('Delete List','e','\'','\''); ?>>
+ <input type="button" id="newlist" class="newlist" value=<?php xl('New List','e','\'','\''); ?>><br>                   
+
+<br><b title='<?php echo xla('Adding new rows to list'); ?>'><?php xl('Add empty rows:','e');?></b>   <input type="text" id="numrows" name="numrows"  value="3" title='<?php echo xla('Enter the number of rows'); ?>' onclick = "javascript:document.theform.numrows.value='';"  />
+ <input type="button" id="btnvalue" class="btnvalue" value=<?php xl('Add','e','\'','\''); ?>>
 </p>
 
 <center>
@@ -966,7 +973,7 @@ if ($list_id) {
     while ($row = sqlFetchArray($res)) {
       writeFSLine($row['fs_category'], $row['fs_option'], $row['fs_codes']);
     }
-    for ($i = 0; $i < 3; ++$i) {
+    for ($i = 0; $i < $cnt; ++$i) {
       writeFSLine('', '', '');
     }
   }
@@ -976,7 +983,7 @@ if ($list_id) {
     while ($row = sqlFetchArray($res)) {
       writeCTLine($row);
     }
-    for ($i = 0; $i < 3; ++$i) {
+    for ($i = 0; $i < $cnt; ++$i) {
       writeCTLine(array());
     }
   }
@@ -986,7 +993,7 @@ if ($list_id) {
     while ($row = sqlFetchArray($res)) {
       writeITLine($row);
     }
-    for ($i = 0; $i < 3; ++$i) {
+    for ($i = 0; $i < $cnt; ++$i) {
       writeITLine(array());
     }
   }  
@@ -999,7 +1006,7 @@ if ($list_id) {
         $row['notes'],$row['codes'],$row['toggle_setting_1'],$row['toggle_setting_2'],
         $row['activity'],$row['subtype']);
     }
-    for ($i = 0; $i < 3; ++$i) {
+    for ($i = 0; $i < $cnt; ++$i) {
       writeOptionLine('', '', '', '', 0);
     }
   }
@@ -1034,6 +1041,7 @@ if ($list_id) {
 
 $(document).ready(function(){
     $("#form_save").click(function() { SaveChanges(); });
+    $("#btnvalue").click(function() { ButtonValue(); });
     $("#list_id").change(function() { $('#theform').submit(); });
 
     $(".newlist").click(function() { NewList(this); });
@@ -1047,7 +1055,11 @@ $(document).ready(function(){
         mysubmit();
     }
 
-    // show the DIV to create a new list
+    var ButtonValue = function() {
+     $("#formaction").val("buttonvalue");
+        mysubmit();
+    }    
+// show the DIV to create a new list
     var NewList = function(btnObj) {
         // show the field details DIV
         $('#newlistdetail').css('visibility', 'visible');

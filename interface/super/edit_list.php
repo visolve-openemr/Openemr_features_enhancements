@@ -353,7 +353,7 @@ function writeOptionLine($option_id, $title, $seq, $default, $value, $mapping=''
   $checked = $default ? " checked" : "";
   $checked_tog1 = $tog1 ? " checked" : "";
   $checked_tog2 = $tog2 ? " checked" : "";
-  $checked_active = $active ? " checked" : "";
+  $checked_active = $active ? " checked" : "checked";
 
   echo " <tr bgcolor='$bgcolor'>\n";
 
@@ -907,12 +907,12 @@ while ($row = sqlFetchArray($res)) {
 </select>
 <input type="button" id="<?php echo $list_id; ?>" class="deletelist" value=<?php xl('Delete List','e','\'','\''); ?>>
 <input type="button" id="newlist" class="newlist" value=<?php xl('New List','e','\'','\''); ?>>
-<br><b title='<?php echo xla('Adding new rows to list'); ?>'><?php xl('Add empty rows:','e');?></b>   <input type="text" id="numrows" name="numrows"  value="3" title='<?php echo xla('Enter the number of rows'); ?>' onclick = "javascript:document.theform.numrows.value='';"/>
-<input type="button" id="btnvalue" class="btnvalue" value=<?php xl('Add','e','\'','\''); ?>>
+<div><b><label><?php echo xlt('Add empty rows:');?></label></b><input type="text" id="numrows" name="numrows"  value="3" title='<?php echo xla('Enter the number of rows'); ?>' onclick = "javascript:document.theform.numrows.value='';"/>
+<input type="button" id="btnvalue" class="btnvalue" value='<?php echo xla('Add'); ?>'>
 <input type="file" name="filename" id="filename" clas="filename" value=<?php xl('Import List','e','\'','\''); ?>>
-<input type="checkbox" id="append" name="append"disabled="disabled" value="checked"><label>Append</label>
+<input type="checkbox" id="append" name="append"disabled="disabled" value="checked"><label><?php echo xlt('Append');?></label>
 <input type="submit" id="import" name="import" class="import" value=<?php xl('Import List','e','\'','\''); ?>disabled="disabled">
-<input type='submit' name='bn_download' value='<?php echo xlt('Download sample CSV file') ?>'>
+<input type='submit' name='bn_download' value='<?php echo xla('Download sample CSV file') ?>'></div>
 </p>
 <center>
 <table cellpadding='2' cellspacing='0'>
@@ -1172,7 +1172,6 @@ $(document).ready(function(){
             $("#theform").submit();
         }
     };
-    
     // just hide the new list DIV
     var CancelNewList = function(btnObj) {
         // hide the list details DIV

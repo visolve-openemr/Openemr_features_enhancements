@@ -393,8 +393,10 @@ function icd_import($type) {
 function valueset_import($type){
 	$dir_valueset = $GLOBALS['temporary_files_dir']."/".$type."/";
     	$dir = str_replace('\\','/',$dir_valueset);
-    sqlStatementNoLog("SET autocommit=0");
-    sqlStatementNoLog("START TRANSACTION");
+
+	// Settings to drastically speed up import with InnoDB
+	sqlStatementNoLog("SET autocommit=0");
+	sqlStatementNoLog("START TRANSACTION");
 	if( is_dir($dir) && $handle = opendir($dir)) {
 		while (false !== ($filename = readdir($handle))) {
 			if(stripos($filename, ".xml")){
@@ -419,6 +421,7 @@ function valueset_import($type){
 			}
 		}
 	}
+	// Settings to drastically speed up import with InnoDB
 	sqlStatementNoLog("COMMIT");
 	sqlStatementNoLog("SET autocommit=1");
         return true;
@@ -448,7 +451,7 @@ function update_tracker_table($type,$revision,$version,$file_checksum) {
         return true;
     }
     else if($type == 'CQM_VALUESET'){
-        sqlStatement("INSERT INTO `standardized_tables_track` (`imported_date`,`name`,`revision_date`) VALUES (NOW(),'CQM_VALUESET',?)", array($revision) );
+        sqlStatement("INSERT INTO `standardized_tables_track` (`imported_date`,`name`,`revision_date`, `revision_version`, `file_checksum`) VALUES (NOW(),'CQM_VALUESET',?,?,?)", array($revision, $version, $file_checksum) );
         return true;
     }
     else { // $type == 'ICD10') 

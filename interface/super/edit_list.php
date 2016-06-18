@@ -21,22 +21,130 @@
  * @author  Teny <teny@zhservices.com> 
  * @link    http://www.open-emr.org
  */
-
 require_once("../globals.php");
 require_once("$srcdir/acl.inc");
 require_once("$srcdir/formdata.inc.php");
 require_once("$srcdir/lists.inc");
 require_once("../../custom/code_types.inc.php");
 require_once("$srcdir/options.inc.php");
-
 $list_id = empty($_REQUEST['list_id']) ? 'language' : $_REQUEST['list_id'];
 
 // Check authorization.
 $thisauth = acl_check('admin', 'super');
 if (!$thisauth) die(xl('Not authorized'));
 
+//Download semple csv file
+
+if (isset($_POST['bn_download'])) {
+ $file= "../../contrib/list_samples/sample.csv";
+ header("Pragma: public", true);
+ header("Expires: 0"); // set expiration time
+ header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
+ header("Content-Type: application/force-download");
+ header("Content-Type: application/octet-stream");
+ header("Content-Type: application/download");
+ header("Content-Disposition: attachment; filename=".basename($file));
+ header("Content-Transfer-Encoding: binary");
+ header("Content-Length: ".filesize($file));
+  ob_clean();
+  flush();
+ readfile($file);
+  exit;
+}
+//Upload File
+  if (isset($_POST['import'])) {
+  if($_POST['append'] == "checked"){
+   $mimes = array('application/vnd.ms-excel','text/plain','text/csv','text/tsv');
+ if (is_uploaded_file($_FILES['filename']['tmp_name'],$mimes)) {
+		readfile($_FILES['filename']['tmp_name']);
+	}
+	//Append uoloaded file to Database
+		if(pathinfo( $_FILES['filename']['name'],PATHINFO_EXTENSION) =='csv') {
+	$handle = fopen($_FILES['filename']['tmp_name'], "r");
+	$firstRow = true;
+	$flg = "false";
+	while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
+	$result = sqlquery("SELECT count(option_id) as cnt FROM list_options WHERE option_id='$data[0]' AND list_id ='$list_id'");
+	$code = sqlquery("SELECT count(ct_id) as cnt1 FROM code_types WHERE ct_id='$data[2]'");
+	$issue = sqlquery("SELECT count(type) as cnt2 FROM issue_types WHERE type ='$data[2]'");
+	if($firstRow) {$firstRow = false;} 
+	else{  
+	    if ($list_id == 'feesheet') {
+	        $import= "INSERT INTO fee_sheet_options (fs_category, fs_option, fs_codes)values('$data[0]','$data[1]','$data[2]')" ;
+	          sqlInsert($import) ;
+	                 $flg = "true";
+	                }
+	    else if ($list_id == 'issue_types') {  
+	        if($issue['cnt2']== 0){
+	        $import= "INSERT INTO issue_types ( active,category,ordering,type,plural,singular,abbreviation,style,force_show)
+	        values('$data[0]','$category','$data[1]','$data[2]','$data[3]','$data[4]','$data[5]','$style','$data[6]') ";
+	         sqlInsert($import) ;
+	        $flg = "true";  
+	         }
+	         else {
+		        die("<span style='color:red;font-weight:bold;'><h3>ERROR:</h3></span><h4>Duplicate values in uploaded CSV file.
+		         </br>Key/Id           should be unique</h4>");
+		        }
+	         }
+	 else if ($list_id == 'code_types' ) {
+	      if($code['cnt1']== 0){
+	       $import= "INSERT INTO code_types(ct_key,ct_id,ct_seq,ct_mod,ct_just,ct_mask,ct_fee,ct_rel,ct_nofs,ct_diag,ct_active,ct_label, ct_external, ct_claim, ct_proc, ct_term, ct_problem, ct_drug) values('$data[1]','$data[2]','$data[4]','$data[5]','$data[6]','$data[7]','$data[9]','$data[10]','$data[11]','$data[13]','$data[0]','$data[3]','$ct_external','$data[8]','$data[12]','$data[14]','$data[15]','$data[16]') ";
+		    sqlInsert($import) ;
+		     $flg = "true";
+		        }
+		        else {
+		        die("<span style='color:red;font-weight:bold;'><h3>ERROR:</h3></span><h4>Duplicate values in uploaded CSV file. </br>Key/Id  should be unique</h4>");
+		        }
+	      }
+	           else {  if($result['cnt'] == 0){
+$import = "INSERT into list_options(list_id,option_id,title,seq,is_default,option_value,mapping,notes,codes,toggle_setting_1, toggle_setting_2,activity,subtype)values('$list_id','$data[0]','$data[1]','$data[2]','$is_default','$option_value','$data[7]','$data[5]','$data[6]','$toggle_setting_1','$toggle_setting_2','$data[4]','$data[8]') ";
+		    sqlInsert($import);
+		    $flg = "true";
+		} 
+		else {
+		  die("<span style='color:red;font-weight:bold;'><h3>ERROR:</h3></span><h4>Duplicate values in uploaded CSV file. </br>Option_id/id  should be unique</h4>");
+		 }
+		 }
+		}
+	 }
+	 if($flg == "true")
+	 {echo "<script type='text/javascript'>alert('Import done!')</script>";} 
+	fclose($handle);
+}
+else {
+		 die("<span style='color:red;font-weight:bold;'><h3>ERROR:</h3></span><h4>Uploaded file is not a valid file. Please upload a valid .csv file. </br>Refer the sample file for more details</h4>");
+		 }
+}
+else if($_POST['append'] != "checked" && $list_id != 'issue_types' && $list_id != 'feesheet' && $list_id != 'code_types')
+{
+ $mimes = array('application/vnd.ms-excel','text/plain','text/csv','text/tsv');
+ if (is_uploaded_file($_FILES['filename']['tmp_name'],$mimes)) {
+		readfile($_FILES['filename']['tmp_name']);
+		}	
+	//Import uploaded file to Database
+	if(pathinfo( $_FILES['filename']['name'],PATHINFO_EXTENSION) =='csv') {
+	$handle = fopen($_FILES['filename']['tmp_name'], "r");
+	$firstRow = true;
+	sqlStatement("DELETE FROM list_options WHERE list_id = ?", array($list_id));
+	while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
+	
+	if($firstRow) { $firstRow = false; }
+	    	else{	    	    	 
+	$import = "INSERT into list_options (list_id,option_id,title,seq,is_default,option_value,mapping,notes,codes,toggle_setting_1, toggle_setting_2,activity,subtype)values('$list_id','$data[0]','$data[1]','$data[2]','$data[3]','$option_value','$data[7]','$data[5]','$data[6]','$toggle_setting_1','$toggle_setting_2','$data[4]','$data[8]')";
+		sqlInsert($import) ;
+		$flg = "true";
+	 }
+	}
+	fclose($handle);
+	 if($flg == "true")
+	 {echo "<script type='text/javascript'>alert('Import done!')</script>";} 
+ }
+ else {die("<span style='color:red;font-weight:bold;'><h3>ERROR:</h3></span><h4>Uploaded file is not a valid file. Please upload a valid .csv file. </br>Refer the sample file for more details</h4>");
+            }
+ }
+else{die("Only Append is possible");}
+}
 // If we are saving, then save.
-//
 if ($_POST['formaction']=='save' && $list_id) {
     $opt = $_POST['opt'];
     if ($list_id == 'feesheet') {
@@ -595,7 +703,6 @@ function writeITLine($it_array) {
   echo ctGenCBox($opt_line_no, $it_array, 'force_show', xl('Show this category on the patient summary screen even if no issues have been entered for this category.'));
   echo " </tr>\n";
 }
-
 ?>
 <html>
 
@@ -622,9 +729,7 @@ a, a:visited, a:hover { color:#0000cc; }
 
 <script type="text/javascript" src="../../library/dialog.js"></script>
 <script type="text/javascript" src="../../library/js/jscolor/jscolor.js"></script>
-
 <script language="JavaScript">
-
 var current_lino = 0;
 
 // Helper function to set the contents of a div.
@@ -793,13 +898,15 @@ function mysubmit() {
  f.submit();
 }
 
+
+
 </script>
 
 </head>
 
 <body class="body_top">
 
-<form method='post' name='theform' id='theform' action='edit_list.php'>
+<form enctype="multipart/form-data" method='post' name='theform' id='theform' action='edit_list.php' >
 <input type="hidden" name="formaction" id="formaction">
 
 <p><b><?php xl('Edit list','e'); ?>:</b>&nbsp;
@@ -833,15 +940,16 @@ while ($row = sqlFetchArray($res)) {
   if ($key == $list_id) echo " selected";
   echo ">" . $row['title'] . "</option>\n";
 }
-
 ?>
 </select>
 <input type="button" id="<?php echo $list_id; ?>" class="deletelist" value=<?php xl('Delete List','e','\'','\''); ?>>
 <input type="button" id="newlist" class="newlist" value=<?php xl('New List','e','\'','\''); ?>>
+<input type="file" name="filename" id="filename" clas="filename" accept='text/csv'  value=<?php xl('Import List','e','\'','\''); ?>>
+<input type="checkbox" id="append" name="append"disabled="disabled" value="checked" checked="checkd"><label><?php echo xlt('Append');?></label>
+<input type="submit" id="import" name="import" class="import" value=<?php xl('Import List','e','\'','\''); ?>disabled="disabled">
+<input type='submit' name='bn_download' value='<?php echo xla('Download sample CSV file') ?>'>
 </p>
-
 <center>
-
 <table cellpadding='2' cellspacing='0'>
  <tr class='head'>
 <?php if ($list_id == 'feesheet') { ?>
@@ -1034,20 +1142,30 @@ if ($list_id) {
 
 $(document).ready(function(){
     $("#form_save").click(function() { SaveChanges(); });
+    $("#btnvalue").click(function() { ButtonValue(); });
     $("#list_id").change(function() { $('#theform').submit(); });
-
     $(".newlist").click(function() { NewList(this); });
     $(".savenewlist").click(function() { SaveNewList(this); });
     $(".deletelist").click(function() { DeleteList(this); });
     $(".cancelnewlist").click(function() { CancelNewList(this); });
-
+    
+  $('#filename').change(function() {
+      if($(this).val()) {
+        $('#import').attr('disabled', '');
+        $('#append').attr('disabled', '');
+      } else {
+        $('#import').attr('disabled', 'disabled');
+        $('#append').attr('disabled', 'disabled');
+      }
+    });
     var SaveChanges = function() {
         $("#formaction").val("save");
         // $('#theform').submit();
         mysubmit();
     }
 
-    // show the DIV to create a new list
+      
+// show the DIV to create a new list
     var NewList = function(btnObj) {
         // show the field details DIV
         $('#newlistdetail').css('visibility', 'visible');
@@ -1086,7 +1204,6 @@ $(document).ready(function(){
             $("#theform").submit();
         }
     };
-    
     // just hide the new list DIV
     var CancelNewList = function(btnObj) {
         // hide the list details DIV
@@ -1095,8 +1212,7 @@ $(document).ready(function(){
         // reset the new group values to a default
         $('#newlistdetail > #newlistname').val("");
     };
-});
+}); 
 
 </script>
-
 </html>

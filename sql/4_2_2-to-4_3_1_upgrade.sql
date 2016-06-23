@@ -123,6 +123,12 @@ CREATE TABLE `valueset` (
 
 -- updating nqf code for cqm measure blood pressure
 UPDATE `clinical_rules` set `cqm_nqf_code` = '0018' where `id` = 'rule_htn_bp_measure_cqm';
+
+#IfNotRow openemr_postcalendar_categories pc_catname Ophthalmological Services
+       SET @catid = (SELECT MAX(pc_catid) FROM  openemr_postcalendar_categories);
+       INSERT INTO `openemr_postcalendar_categories` VALUES (@catid+1, 'Ophthalmological Services', '#F89219', 'Ophthalmological Services', 0, NULL, 'a:5:{s:17:"event_repeat_freq";s:1:"0";s:22:"event_repeat_freq_type";s:1:"0";s:19:"event_repeat_on_num";s:1:"1";s:19:"event_repeat_on_day";s:1:"0";s:20:"event_repeat_on_freq";s:1:"0";}', 0, 900, 0, 0, 0, 0, 0,0,1,@catid+1);
+       INSERT INTO `enc_category_map` ( `rule_enc_id`, `main_cat_id` ) VALUES ('enc_ophthal_serv', @catid+1);
+#EndIf
 --
 
 #IfMissingColumn immunizations information_source

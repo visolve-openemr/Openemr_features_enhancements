@@ -239,6 +239,9 @@ else if ($_POST['formaction']=='deletelist') {
     sqlStatement("DELETE FROM list_options WHERE list_id = 'lists' and option_id='".$_POST['list_id']."'");
 }
 
+else if($_POST['formaction']=='buttonvalue'){
+ $cnt= $_POST['numrows'];
+}
 $opt_line_no = 0;
 
 // Given a string of multiple instances of code_type|code|selector,
@@ -274,7 +277,7 @@ function getCodeDescriptions($codes) {
 
 // Write one option line to the form.
 //
-function writeOptionLine($option_id, $title, $seq, $default, $value, $mapping='', $notes='', $codes='',$tog1='', $tog2='', $active='',$subtype='') {
+function writeOptionLine($option_id, $title, $seq, $default, $value, $mapping='', $notes='', $codes='',$tog1='', $tog2='', $active='1',$subtype='') {
   global $opt_line_no, $list_id;
   ++$opt_line_no;
   $bgcolor = "#" . (($opt_line_no & 1) ? "ddddff" : "ffdddd");
@@ -775,9 +778,9 @@ function defClicked(lino) {
 function mysubmit() {
  var f = document.forms[0];
  if (f.list_id.value == 'code_types') {
-  for (var i = 1; f['opt[' + i + '][ct_key]'].value; ++i) {
+  for (var i = 1; (f['opt[' + i + '][ct_key]']?f['opt[' + i + '][ct_key]'].value:false); ++i) {
    var ikey = 'opt[' + i + ']';
-   for (var j = i+1; f['opt[' + j + '][ct_key]'].value; ++j) {
+   for (var j = i+1; (f['opt[' + j + '][ct_key]']?f['opt[' + j + '][ct_key]'].value:false); ++j) {
     var jkey = 'opt[' + j + ']';
     if (f[ikey+'[ct_key]'].value == f[jkey+'[ct_key]'].value) {
      alert('<?php echo xl('Error: duplicated name on line') ?>' + ' ' + j);
@@ -836,8 +839,12 @@ while ($row = sqlFetchArray($res)) {
 
 ?>
 </select>
-<input type="button" id="<?php echo $list_id; ?>" class="deletelist" value=<?php xl('Delete List','e','\'','\''); ?>>
-<input type="button" id="newlist" class="newlist" value=<?php xl('New List','e','\'','\''); ?>>
+
+ <input type="button" id="<?php echo $list_id; ?>" class="deletelist" value=<?php xl('Delete List','e','\'','\''); ?>>
+ <input type="button" id="newlist" class="newlist" value=<?php xl('New List','e','\'','\''); ?>><br>                   
+
+<br><b title='<?php echo xla('Adding new rows to list'); ?>'><?php xl('Add empty rows:','e');?></b>   <input type="text" id="numrows" name="numrows"  value="3" title='<?php echo xla('Enter the number of rows'); ?>' onclick = "javascript:document.theform.numrows.value='';"  />
+ <input type="button" id="btnvalue" class="btnvalue" value=<?php xl('Add','e','\'','\''); ?>>
 </p>
 
 <center>
@@ -977,7 +984,7 @@ if ($list_id) {
     while ($row = sqlFetchArray($res)) {
       writeFSLine($row['fs_category'], $row['fs_option'], $row['fs_codes']);
     }
-    for ($i = 0; $i < 3; ++$i) {
+    for ($i = 0; $i < $cnt; ++$i) {
       writeFSLine('', '', '');
     }
   }
@@ -987,7 +994,7 @@ if ($list_id) {
     while ($row = sqlFetchArray($res)) {
       writeCTLine($row);
     }
-    for ($i = 0; $i < 3; ++$i) {
+    for ($i = 0; $i < $cnt; ++$i) {
       writeCTLine(array());
     }
   }
@@ -997,7 +1004,7 @@ if ($list_id) {
     while ($row = sqlFetchArray($res)) {
       writeITLine($row);
     }
-    for ($i = 0; $i < 3; ++$i) {
+    for ($i = 0; $i < $cnt; ++$i) {
       writeITLine(array());
     }
   }  
@@ -1010,7 +1017,7 @@ if ($list_id) {
         $row['notes'],$row['codes'],$row['toggle_setting_1'],$row['toggle_setting_2'],
         $row['activity'],$row['subtype']);
     }
-    for ($i = 0; $i < 3; ++$i) {
+    for ($i = 0; $i < $cnt; ++$i) {
       writeOptionLine('', '', '', '', 0);
     }
   }
@@ -1045,8 +1052,9 @@ if ($list_id) {
 
 $(document).ready(function(){
     $("#form_save").click(function() { SaveChanges(); });
+    $("#btnvalue").click(function() { ButtonValue(); });
     $("#list_id").change(function() { $('#theform').submit(); });
-
+$("#list_id").change(function() { $('#theform').mysubmit(); });
     $(".newlist").click(function() { NewList(this); });
     $(".savenewlist").click(function() { SaveNewList(this); });
     $(".deletelist").click(function() { DeleteList(this); });
@@ -1058,7 +1066,11 @@ $(document).ready(function(){
         mysubmit();
     }
 
-    // show the DIV to create a new list
+    var ButtonValue = function() {
+     $("#formaction").val("buttonvalue");
+        mysubmit();
+    }    
+// show the DIV to create a new list
     var NewList = function(btnObj) {
         // show the field details DIV
         $('#newlistdetail').css('visibility', 'visible');

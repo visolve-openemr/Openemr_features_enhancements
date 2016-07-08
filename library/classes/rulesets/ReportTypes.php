@@ -63,7 +63,7 @@ class ReportTypes
         "family_health_history_amc" => array( ReportTypes::AMC, "AMC_314g_1_2_21" ),
         "electronic_notes_amc" => array( ReportTypes::AMC, "AMC_314g_1_2_22" ),
         "secure_messaging_amc" => array( ReportTypes::AMC, "AMC_314g_1_2_19" ),
-        "view_download_transmit_amc" => array( ReportTypes::AMC, "AMC_314g_1_2_14" ),  //Stage 1&2 View Download Transmit
+        "view_download_transmit_amc" => array( ReportTypes::AMC, "AMC_314g_1_2_14" ),  //Stage 1&2 View Download Transmit - VDT Measure B
         "cpoe_radiology_amc" => array( ReportTypes::AMC, "AMC_304a_1" ),   //Stage 2 CPOE Radiology Orders
         "cpoe_proc_orders_amc" => array( ReportTypes::AMC, "AMC_304a_2" ), //Stage 2 CPOE Procedure Orders
         "cpoe_med_stage2_amc" => array( ReportTypes::AMC, "AMC_304a_3" ), //Stage 2 CPOE Medication Orders
@@ -75,12 +75,12 @@ class ReportTypes
         "record_vitals_4_stage1_amc" => array( ReportTypes::AMC, "AMC_302f_4_STG1" ),//Stage 1 vitals set4
         "record_vitals_stage2_amc" => array( ReportTypes::AMC, "AMC_302f_STG2" ),//Stage 2 vitals
         "provide_sum_pat_stage2_amc" => array( ReportTypes::AMC, "AMC_304h_STG2" ), //Stage 2 Clinical Summary
-        "vdt_stage2_amc" => array( ReportTypes::AMC, "AMC_314g_1_2_14_STG2" ),  //Stage 1&2 View Download Transmit
+        "vdt_stage2_amc" => array( ReportTypes::AMC, "AMC_314g_1_2_14_STG2" ),  //Stage 1&2 View Download Transmit -  VDT Measure A
         "send_sum_stage1_amc" => array( ReportTypes::AMC, "AMC_304i_STG1" ), //Stage 1 Summary of care
         "send_sum_1_stage2_amc" => array( ReportTypes::AMC, "AMC_304i_STG1" ), //Stage 2 Summary of care Measure A(Same as Stage1)
         "send_sum_stage2_amc" => array( ReportTypes::AMC, "AMC_304i_STG2" ), //Stage 2 Summary of care Measure B
         "e_prescribe_stage1_amc" => array( ReportTypes::AMC, "AMC_304b_STG1" ),//Stage 1 eRx
-        "e_prescribe_1_stage2_amc" => array( ReportTypes::AMC, "AMC_304b_1_STG2" ),//Stage 2 eRx(Controlled Substances)
-        "e_prescribe_2_stage2_amc" => array( ReportTypes::AMC, "AMC_304b_2_STG2" ),//Stage 2 eRx(UnControlled Substances)
+        "e_prescribe_1_stage2_amc" => array( ReportTypes::AMC, "AMC_304b_1_STG2" ),//Stage 2 eRx(All Prescriptions including controlled substances)
+        "e_prescribe_2_stage2_amc" => array( ReportTypes::AMC, "AMC_304b_2_STG2" ),//Stage 2 eRx(Prescrptions count excluding controlled substances)
     );
 }

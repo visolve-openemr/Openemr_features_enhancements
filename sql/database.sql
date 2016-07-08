@@ -37,6 +37,7 @@ CREATE TABLE `amc_misc_data` (
   `map_id` bigint(20) NOT NULL default '0' COMMENT 'Maps to an object id (such as prescription id etc.)',
   `date_created` datetime default NULL,
   `date_completed` datetime default NULL,
+  `soc_provided` boolean default 0,
   KEY  (`amc_id`,`pid`,`map_id`)
 ) ENGINE=MyISAM;
 

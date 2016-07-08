@@ -534,3 +534,7 @@ DELETE FROM `enc_category_map` where rule_enc_id = 'enc_pregnancy' and main_cat_
 ALTER TABLE  `documents` ADD  `thumb_url` VARCHAR( 255 ) DEFAULT NULL;
 #EndIf
 
+#IfMissingColumn amc_misc_data soc_provided
+       ALTER TABLE `amc_misc_data` add column `soc_provided` boolean default 0;
+#EndIf
+

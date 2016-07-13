@@ -287,7 +287,7 @@ abstract class AbstractAmcReport implements RsReportIF
                	break;
 			
 			case "lab_radiology":
-				$sql = "SELECT prc.procedure_code FROM procedure_order pr ".
+				$sql = "SELECT prc.* FROM procedure_order pr ".
 					  "INNER JOIN procedure_order_code prc ON pr.procedure_order_id = prc.procedure_order_id ".
 					  "WHERE pr.patient_id = ? ".
 					  "AND prc.procedure_order_title LIKE '%imaging%' ".
@@ -296,7 +296,7 @@ abstract class AbstractAmcReport implements RsReportIF
                 break;
 			
 			case "cpoe_lab_orders":
-				$sql = "SELECT prc.procedure_code FROM procedure_order pr ".
+				$sql = "SELECT prc.* FROM procedure_order pr ".
 					  "INNER JOIN procedure_order_code prc ON pr.procedure_order_id = prc.procedure_order_id ".
 					  "WHERE pr.patient_id = ? ".
 					  "AND (prc.procedure_order_title LIKE '%Laboratory%' or (prc.procedure_source = 2 and prc.procedure_order_title is NULL)) ".
@@ -317,7 +317,7 @@ abstract class AbstractAmcReport implements RsReportIF
                 break;
 				
 			case "lab_orders":
-               $sql = "SELECT prc.procedure_code FROM procedure_order pr ".
+               $sql = "SELECT prc.* FROM procedure_order pr ".
 					  "INNER JOIN procedure_order_code prc ON pr.procedure_order_id = prc.procedure_order_id ".
 					  "WHERE pr.patient_id = ? ".
 					  "AND (prc.procedure_order_title LIKE '%Laboratory%' or (prc.procedure_source = 2 and prc.procedure_order_title is NULL)) ".

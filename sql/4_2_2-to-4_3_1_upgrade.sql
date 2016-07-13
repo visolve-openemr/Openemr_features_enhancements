@@ -538,3 +538,6 @@ ALTER TABLE  `documents` ADD  `thumb_url` VARCHAR( 255 ) DEFAULT NULL;
        ALTER TABLE `amc_misc_data` add column `soc_provided` boolean default 0;
 #EndIf
 
+#IfMissingColumn documents image_procedure_id
+	ALTER TABLE `documents` ADD COLUMN `image_procedure_id` bigint(20) DEFAULT 0;
+#EndIf

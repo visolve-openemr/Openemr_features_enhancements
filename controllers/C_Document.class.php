@@ -343,7 +343,22 @@ class C_Document extends Controller {
 		$this->assign("VISIT_CATEGORY_LIST", $visit_category_list);
 		 
 		$this->assign("notes",$notes);
-		
+
+		$this->assign("IMG_PROCEDURE_TAG_ACTION",$this->_link("image_procedure") . "document_id=" . $d->get_id());
+	        // Populate the dropdown with image procedure order list
+		$imgOptions = "<option value='0'>-- " . xlt('Select Image Procedure') . " --</option>";
+		$imgOrders  = sqlStatement("select procedure_name,po.procedure_order_id from procedure_order po inner join procedure_order_code poc on poc.procedure_order_id = po.procedure_order_id where po.patient_id = ?  and poc.procedure_order_title = 'imaging'",array($patient_id));
+		if(sqlNumRows($imgOrders) > 0){
+			 while($row = sqlFetchArray($imgOrders)) {
+				$sel_proc = ($row['procedure_order_id'] == $d->get_image_procedure_id()) ? ' selected' : '';
+				$imgOptions .= "<option value='". attr($row['procedure_order_id']). "' $sel_proc>".text($row['procedure_name'])."</option>";
+			}
+		}
+
+		$this->assign('IMAGE_PROCEDURE_LIST',$imgOptions);
+
+		$this->assign('clear_procedure_tag',$this->_link('clear_procedure_tag')."document_id=" . $d->get_id());
+
 		$this->_last_node = null;
 		
 		$menu  = new HTML_TreeMenu();
@@ -1220,6 +1235,39 @@ function tag_action_process($patient_id="", $document_id) {
 	$this->_state = false;
 	$this->assign("messages", $messages);
 	
+	return $this->view_action($patient_id, $document_id);
+}
+
+function image_procedure_action($patient_id="",$document_id){
+
+	$img_procedure_id = $_POST['image_procedure_id'];
+	if(is_numeric($document_id)){
+		$d = new Document($document_id);
+		$d->set_image_procedure_id($img_procedure_id);
+		$d->persist();
+		
+		$img_order  = sqlQuery("select * from procedure_order where procedure_order_id = ?",array($img_procedure_id));
+		$img_report = sqlQuery("select * from procedure_report where procedure_order_id = ?",array($img_procedure_id));
+		$img_report_id = !empty($img_report['procedure_report_id']) ? $img_report['procedure_report_id'] : 0;  
+		if($img_report_id == 0){
+			$report_date = date('Y-m-d H:i:s');
+			$img_report_id = sqlInsert("INSERT INTO procedure_report(procedure_order_id,date_collected,date_report,report_status) values(?,?,?,'final')",array($img_procedure_id,$img_order['date_collected'],$report_date)); 
+		}
+		
+		$img_result = sqlQuery("select * from procedure_result where procedure_report_id = ? and document_id = ?",array($img_report_id,$document_id));
+		if(empty($img_result)){
+			sqlInsert("INSERT INTO procedure_result(procedure_report_id,date,document_id,result_status) values(?,?,?,'final')",array($img_report_id,date('Y-m-d H:i:s'),$document_id));
+		}
+	}
+	return $this->view_action($patient_id, $document_id);
+}
+
+function clear_procedure_tag_action($patient_id="",$document_id){
+	if(is_numeric($document_id)){
+		$d = new Document($document_id);
+		$d->set_image_procedure_id(0);
+		$d->persist();
+	}
 	return $this->view_action($patient_id, $document_id);
 }
 

@@ -112,6 +112,9 @@ class Document extends ORDataObject{
 	var $encounter_id;
 	var $encounter_check;
 
+	// For tagging with image order
+	var $image_procedure_id;
+
   /*
 	*	Whether the file is already imported
 	*	@var int
@@ -143,6 +146,7 @@ class Document extends ORDataObject{
 		$this->list_id = 0;
 		$this->encounter_id = 0;
 		$this->encounter_check = "";
+		$this->image_procedure_id = 0;
 		
 		if ($id != "") {
 			$this->populate();
@@ -377,6 +381,12 @@ class Document extends ORDataObject{
 	}
 	function get_encounter_id() {
 		return $this->encounter_id;
+	}
+	function set_image_procedure_id($img_procedure_id){
+		$this->image_procedure_id = $img_procedure_id;
+	}
+	function get_image_procedure_id(){
+		return $this->image_procedure_id;
 	}
 	function set_encounter_check($encounter_check) {
 		$this->encounter_check = $encounter_check;

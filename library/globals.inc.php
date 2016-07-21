@@ -1415,8 +1415,8 @@ $GLOBALS_METADATA = array(
      'new_validate' => array(
       xl('New form validation'),
       'bool',
-      '0',
-      ''
+      '1',
+      xl('New form validation')
      ),
 
   ),

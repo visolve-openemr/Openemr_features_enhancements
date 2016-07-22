@@ -76,6 +76,7 @@ function ImgProcedure() {literal}{{/literal}
 		alert("{xl t='Please select image procedure'}");
 		return false;
 	{literal}}{/literal}
+	f.procedure_code.value = f.image_procedure_id.options[f.image_procedure_id.selectedIndex].getAttribute('data-code');
 	document.forms['img_procedure_tag'].submit();	
 {literal}}{/literal}
  // Process click on Import link.
@@ -231,6 +232,7 @@ function ImgProcedure() {literal}{{/literal}
 		   <br/>
 		   <div class="text">
 			<form method="post" name="img_procedure_tag" id="img_procedure_tag" action="{$IMG_PROCEDURE_TAG_ACTION}" onsubmit="return top.restoreSession()">
+			<input type='hidden' name='procedure_code' value=''>
 			<div>
 				<div style="float:left">
 					<b>{xl t='Tag to Image Procedure'}</b>&nbsp;

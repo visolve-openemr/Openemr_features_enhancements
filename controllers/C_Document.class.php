@@ -347,11 +347,14 @@ class C_Document extends Controller {
 		$this->assign("IMG_PROCEDURE_TAG_ACTION",$this->_link("image_procedure") . "document_id=" . $d->get_id());
 	        // Populate the dropdown with image procedure order list
 		$imgOptions = "<option value='0'>-- " . xlt('Select Image Procedure') . " --</option>";
-		$imgOrders  = sqlStatement("select procedure_name,po.procedure_order_id from procedure_order po inner join procedure_order_code poc on poc.procedure_order_id = po.procedure_order_id where po.patient_id = ?  and poc.procedure_order_title = 'imaging'",array($patient_id));
+		$imgOrders  = sqlStatement("select procedure_name,po.procedure_order_id,procedure_code from procedure_order po inner join procedure_order_code poc on poc.procedure_order_id = po.procedure_order_id where po.patient_id = ?  and poc.procedure_order_title = 'imaging'",array($patient_id));
+		$mapping    = $this->get_mapped_procedure($d->get_id());
 		if(sqlNumRows($imgOrders) > 0){
 			 while($row = sqlFetchArray($imgOrders)) {
-				$sel_proc = ($row['procedure_order_id'] == $d->get_image_procedure_id()) ? ' selected' : '';
-				$imgOptions .= "<option value='". attr($row['procedure_order_id']). "' $sel_proc>".text($row['procedure_name'])."</option>";
+			 	$sel_proc = '';
+			 	if((isset($mapping['procedure_code']) && $mapping['procedure_code'] == $row['procedure_code']) && (isset($mapping['procedure_code']) && $mapping['procedure_order_id'] == $row['procedure_order_id']))
+					$sel_proc = 'selected';
+				$imgOptions .= "<option value='". attr($row['procedure_order_id']). "' data-code='".attr($row['procedure_code'])."' $sel_proc>".text($row['procedure_name'].' - '.$row['procedure_code'])."</option>";
 			}
 		}
 
@@ -1241,17 +1244,16 @@ function tag_action_process($patient_id="", $document_id) {
 function image_procedure_action($patient_id="",$document_id){
 
 	$img_procedure_id = $_POST['image_procedure_id'];
+	$proc_code = $_POST['procedure_code'];
+	
 	if(is_numeric($document_id)){
-		$d = new Document($document_id);
-		$d->set_image_procedure_id($img_procedure_id);
-		$d->persist();
-		
-		$img_order  = sqlQuery("select * from procedure_order where procedure_order_id = ?",array($img_procedure_id));
-		$img_report = sqlQuery("select * from procedure_report where procedure_order_id = ?",array($img_procedure_id));
+				
+		$img_order  = sqlQuery("select * from procedure_order_code where procedure_order_id = ? and procedure_code = ? ",array($img_procedure_id,$proc_code));
+		$img_report = sqlQuery("select * from procedure_report where procedure_order_id = ? and procedure_order_seq = ? ",array($img_procedure_id,$img_order['procedure_order_seq']));
 		$img_report_id = !empty($img_report['procedure_report_id']) ? $img_report['procedure_report_id'] : 0;  
 		if($img_report_id == 0){
 			$report_date = date('Y-m-d H:i:s');
-			$img_report_id = sqlInsert("INSERT INTO procedure_report(procedure_order_id,date_collected,date_report,report_status) values(?,?,?,'final')",array($img_procedure_id,$img_order['date_collected'],$report_date)); 
+			$img_report_id = sqlInsert("INSERT INTO procedure_report(procedure_order_id,procedure_order_seq,date_collected,date_report,report_status) values(?,?,?,?,'final')",array($img_procedure_id,$img_order['procedure_order_seq'],$img_order['date_collected'],$report_date)); 
 		}
 		
 		$img_result = sqlQuery("select * from procedure_result where procedure_report_id = ? and document_id = ?",array($img_report_id,$document_id));
@@ -1264,11 +1266,21 @@ function image_procedure_action($patient_id="",$document_id){
 
 function clear_procedure_tag_action($patient_id="",$document_id){
 	if(is_numeric($document_id)){
-		$d = new Document($document_id);
-		$d->set_image_procedure_id(0);
-		$d->persist();
+		sqlStatement("delete from procedure_result where document_id = ?",$document_id);
 	}
 	return $this->view_action($patient_id, $document_id);
+}
+
+function get_mapped_procedure($document_id){
+	$map = array();
+	if(is_numeric($document_id)){
+		$map = sqlQuery("select poc.procedure_order_id,poc.procedure_code from procedure_result pres
+						   inner join procedure_report pr on pr.procedure_report_id = pres.procedure_report_id 
+						   inner join procedure_order_code poc on (poc.procedure_order_id = pr.procedure_order_id and poc.procedure_order_seq = pr.procedure_order_seq) 
+						   inner join procedure_order po on po.procedure_order_id = poc.procedure_order_id 
+						   where pres.document_id = ?",array($document_id));
+	}
+	return $map;
 }
 
 }

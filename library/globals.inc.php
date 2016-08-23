@@ -2732,6 +2732,18 @@ $GLOBALS_METADATA = array(
       '8',
       xl('Bottom Margin (px)')
     ),
+    'cms_1500_left_margin' => array(
+      xl('CMS 1500 Left Margin (px)'),
+      'num',
+      '8',
+      xl('CMS 1500 Left Margin (px)')
+    ),
+    'cms_1500_top_margin' => array(
+      xl('CMS 1500 Top Margin (px)'),
+      'num',
+      '8',
+      xl('CMS 1500 Top Margin (px)')
+    ),
    'pdf_output' => array (
        xl('Output Type'),
        array(

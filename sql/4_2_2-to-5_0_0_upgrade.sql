@@ -750,3 +750,11 @@ ALTER TABLE `insurance_companies` CHANGE `freeb_type` `ins_type_code` tinyint(2)
 #IfTable integration_mapping
 DROP TABLE IF EXISTS `integration_mapping`;
 #EndIf
+
+#IfNotRow globals gl_name cms_1500_left_margin
+INSERT INTO `globals` ( `gl_name`, `gl_value`) VALUES ('cms_1500_left_margin', 24);
+#EndIf
+
+#IfNotRow globals gl_name cms_1500_top_margin
+INSERT INTO `globals` ( `gl_name`, `gl_value`) VALUES ('cms_1500_top_margin', 20);
+#EndIf
